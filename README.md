@@ -9,8 +9,10 @@ Node 20.09
 npm i
 ```
 
-## Installation
+## Contributors
 
-[<img src="https://github.com/elkofy.png" width="60px;"/><br /><sub><a href="https://github.com/elkofy">elkofy</a></sub>](https://github.com/elkofy/NetFraude_Backend
+<a href="https://github.com/elkofy/NetFraude_Backend/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=elkofy/NetFraude_Backend" />
+</a>
 
-[](https://github.com/elkofy.png?size=50)](https://github.com/elkofy)
+Made with [contrib.rocks](https://contrib.rocks).
