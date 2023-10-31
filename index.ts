@@ -28,6 +28,18 @@ const typeDefs = `#graphql
   }
 `;
 
+const resolvers = {
+  Query: {
+    musics: async () => {
+      return [];
+    },
+    music: async (parent: any, args: any) => {
+      const { id } = args;
+      return [];
+    },
+  },
+};
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Welcome to Express & TypeScript Server");
 });
