@@ -1,5 +1,6 @@
 import express, { Express, Request, Response, Application } from "express";
 import dotenv from "dotenv";
+import { Sequelize, DataTypes } from 'sequelize';
 
 //For env File
 dotenv.config();
@@ -7,17 +8,18 @@ dotenv.config();
 const app: Application = express();
 const port = process.env.PORT || 8000;
 
+
 interface Movie {
-  id: number;
   title: string;
   duration: string;
   genre: string;
   poster: string;
 }
 
-let ALL_MEDIAS: Movie[] = [
+
+
+let allMedias: any[] = [
   {
-    id: 1,
     title: "Une pisse",
     duration: "1h30",
     genre: "Figé",
@@ -25,7 +27,6 @@ let ALL_MEDIAS: Movie[] = [
       "https://static.wikia.nocookie.net/onepiece/images/a/aa/Volume_77.png",
   },
   {
-    id: 2,
     title: "Dragon Boule à Z",
     duration: "1h30",
     genre: "Figé",
@@ -33,7 +34,6 @@ let ALL_MEDIAS: Movie[] = [
       "https://ih1.redbubble.net/image.1062591670.5646/mwo,x1000,ipad_2_snap-pad,750x1000,f8f8f8.jpg",
   },
   {
-    id: 3,
     title: "Gunter x Gunter",
     duration: "1h30",
     genre: "Figé",
@@ -41,53 +41,71 @@ let ALL_MEDIAS: Movie[] = [
   },
 ];
 
-app.get("/movies", (req: Request, res: Response) => {
+const sequelize = new Sequelize({dialect: 'sqlite', storage: "./db-sqlite"});
+const Movies = sequelize.define('Movies', {
+  title: DataTypes.STRING,
+  duration: DataTypes.STRING,
+  genre: DataTypes.STRING,
+  poster: DataTypes.STRING
+});
+
+
+sequelize.sync({ force: true });
+
+app.get("/movies", async (req: Request, res: Response) => {
   // GET ALL MOVIES
-  return res.send(ALL_MEDIAS);
+  const allMovies = await Movies.findAll()
+  console.log(allMovies)
+  
+  return res.send(allMovies);
 });
 
 app.post("/movies", (req: Request, res: Response) => {
   // ADD MOVIE
-  console.log(req.body.movie);
+  console.log(req.body)
+  Movies.create()
 
-  ALL_MEDIAS.push(req.body.movie);
-
-  return req.body.movie;
+  return res.status(200).send("movie creates");
 });
 
-app.get("/movies/:id", (req: Request, res: Response) => {
+app.get("/movies/:id", async (req: Request, res: Response) => {
   // GET ONE MOVIE
-  const movie = ALL_MEDIAS.filter((res) => res.id.toString() === req.params.id);
+  const currentMovie = await Movies.findByPk(req.params.id);
 
-  if (!movie.length) {
+  if (!currentMovie) {
     return res.status(404).send("Not Found");
   }
 
-  return res.send(movie);
+  return res.send(currentMovie);
 });
 
 app.put("/movies/:id", (req: Request, res: Response) => {
   // CHANGE ONE MOVIE
-  let objIndex = ALL_MEDIAS.findIndex(
+  let objIndex = allMedias.findIndex(
     (obj) => obj.id.toString() === req.params.id
   );
 
-  ALL_MEDIAS[objIndex] = { ...req.body.movie };
+  allMedias[objIndex] = { ...req.body.movie };
 
   return req.body.movie;
 });
 
 app.delete("/movies/:id", (req: Request, res: Response) => {
   // DELETE ONE MOVIE
-  ALL_MEDIAS = ALL_MEDIAS.filter((res) => res.id.toString() !== req.params.id);
+  Movies.destroy({
+    where: {
+      id: req.params.id
+    }
+  });
 
-  return req.params.id;
+  return res.status(200).send(`movie ${req.params.id} is deleted`);
 });
 
-// app.get("/", (req: Request, res: Response) => {
-//   res.send("Welcome to Express & TypeScript Server");
-// });
+app.get("/init", (req: Request, res: Response) => {
+  Movies.bulkCreate(allMedias);
+  res.send("initialized");
+});
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`Server is Fire at http://localhost:${port}`);
 });
