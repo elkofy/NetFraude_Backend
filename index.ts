@@ -7,6 +7,30 @@ dotenv.config();
 const app: Application = express();
 const port = process.env.PORT || 8000;
 
+const ALL_MEDIAS = [
+  {
+    id: 1,
+    title: 'Une pisse',
+    duration: '1h30',
+    genre: 'Figé',
+    poster: 'https://static.wikia.nocookie.net/onepiece/images/a/aa/Volume_77.png'
+  },
+  {
+    id: 2,
+    title: 'Dragon Boule à Z',
+    duration: '1h30',
+    genre: 'Figé',
+    poster: 'https://ih1.redbubble.net/image.1062591670.5646/mwo,x1000,ipad_2_snap-pad,750x1000,f8f8f8.jpg'
+  },
+  {
+    id: 3,
+    title: 'Gunter x Gunter',
+    duration: '1h30',
+    genre: 'Figé',
+    poster: 'https://fr.web.img5.acsta.net/pictures/19/08/01/09/52/4803203.jpg'
+  }
+];
+
 const typeDefs = `#graphql
   type Movie {
     id: ID
@@ -30,12 +54,13 @@ const typeDefs = `#graphql
 
 const resolvers = {
   Query: {
-    musics: async () => {
-      return [];
+    movies: async () => {
+      return ALL_MEDIAS;
     },
-    music: async (parent: any, args: any) => {
+    movie: async (parent: any, args: any) => {
       const { id } = args;
-      return [];
+      const media = ALL_MEDIAS.find((media) => media.id == id)
+      return media
     },
   },
 };
