@@ -41,40 +41,6 @@ let ALL_MEDIAS: Movie[] = [
   },
 ];
 
-const typeDefs = `#graphql
-  type Movie {
-    id: ID
-    title: String
-    duration: String
-    genre: String
-    picture: String
-  }
-
-  type Query {
-    movies: [Movie]
-    movie(id: ID!): Movie
-  }
-
-  type Mutation {
-    addMovie(title: String, duration: String, genre: String, picture: String): Movie
-    updateMovie(id: ID!, title: String, duration: String, genre: String, picture: String): Movie
-    deleteMovie(id: ID!): Movie
-  }
-`;
-
-const resolvers = {
-  Query: {
-    movies: async () => {
-      return ALL_MEDIAS;
-    },
-    movie: async (parent: any, args: any) => {
-      const { id } = args;
-      const media = ALL_MEDIAS.find((media) => media.id == id);
-      return media;
-    },
-  },
-};
-
 app.get("/movies", (req: Request, res: Response) => {
   // GET ALL MOVIES
   return res.send(ALL_MEDIAS);
