@@ -8,18 +8,17 @@ dotenv.config();
 const app: Application = express();
 const port = process.env.PORT || 8000;
 
-
 interface Movie {
+  id: number;
   title: string;
   duration: string;
   genre: string;
   poster: string;
 }
 
-
-
-let allMedias: any[] = [
+let ALL_MEDIAS: Movie[] = [
   {
+    id: 1,
     title: "Une pisse",
     duration: "1h30",
     genre: "Figé",
@@ -27,6 +26,7 @@ let allMedias: any[] = [
       "https://static.wikia.nocookie.net/onepiece/images/a/aa/Volume_77.png",
   },
   {
+    id: 2,
     title: "Dragon Boule à Z",
     duration: "1h30",
     genre: "Figé",
@@ -34,6 +34,7 @@ let allMedias: any[] = [
       "https://ih1.redbubble.net/image.1062591670.5646/mwo,x1000,ipad_2_snap-pad,750x1000,f8f8f8.jpg",
   },
   {
+    id: 3,
     title: "Gunter x Gunter",
     duration: "1h30",
     genre: "Figé",
@@ -41,70 +42,52 @@ let allMedias: any[] = [
   },
 ];
 
-const sequelize = new Sequelize({dialect: 'sqlite', storage: "./db-sqlite"});
-const Movies = sequelize.define('Movies', {
-  title: DataTypes.STRING,
-  duration: DataTypes.STRING,
-  genre: DataTypes.STRING,
-  poster: DataTypes.STRING
-});
-
-
-sequelize.sync({ force: true });
-
-app.get("/movies", async (req: Request, res: Response) => {
+app.get("/movies", (req: Request, res: Response) => {
   // GET ALL MOVIES
-  const allMovies = await Movies.findAll()
-  console.log(allMovies)
-  
-  return res.send(allMovies);
+  return res.send(ALL_MEDIAS);
 });
 
 app.post("/movies", (req: Request, res: Response) => {
   // ADD MOVIE
-  console.log(req.body)
-  Movies.create()
+  console.log(req.body.movie);
 
-  return res.status(200).send("movie creates");
+  ALL_MEDIAS.push(req.body.movie);
+
+  return req.body.movie;
 });
 
-app.get("/movies/:id", async (req: Request, res: Response) => {
+app.get("/movies/:id", (req: Request, res: Response) => {
   // GET ONE MOVIE
-  const currentMovie = await Movies.findByPk(req.params.id);
+  const movie = ALL_MEDIAS.filter((res) => res.id.toString() === req.params.id);
 
-  if (!currentMovie) {
+  if (!movie.length) {
     return res.status(404).send("Not Found");
   }
 
-  return res.send(currentMovie);
+  return res.send(movie);
 });
 
 app.put("/movies/:id", (req: Request, res: Response) => {
   // CHANGE ONE MOVIE
-  let objIndex = allMedias.findIndex(
+  let objIndex = ALL_MEDIAS.findIndex(
     (obj) => obj.id.toString() === req.params.id
   );
 
-  allMedias[objIndex] = { ...req.body.movie };
+  ALL_MEDIAS[objIndex] = { ...req.body.movie };
 
   return req.body.movie;
 });
 
 app.delete("/movies/:id", (req: Request, res: Response) => {
   // DELETE ONE MOVIE
-  Movies.destroy({
-    where: {
-      id: req.params.id
-    }
-  });
+  ALL_MEDIAS = ALL_MEDIAS.filter((res) => res.id.toString() !== req.params.id);
 
-  return res.status(200).send(`movie ${req.params.id} is deleted`);
+  return req.params.id;
 });
 
-app.get("/init", (req: Request, res: Response) => {
-  Movies.bulkCreate(allMedias);
-  res.send("initialized");
-});
+// app.get("/", (req: Request, res: Response) => {
+//   res.send("Welcome to Express & TypeScript Server");
+// });
 
 app.listen(port, async () => {
   console.log(`Server is Fire at http://localhost:${port}`);
