@@ -1,74 +1,76 @@
-import express, { Express, Request, Response, Application } from "express";
+import express, { Request, Response, Application } from "express";
 import dotenv from "dotenv";
+import { PrismaClient } from '@prisma/client'
 
 //For env File
 dotenv.config();
 
 const app: Application = express();
 const port = process.env.PORT || 8000;
+app.use(express.json())
 
-const ALL_MEDIAS = [
-  {
-    id: 1,
-    title: 'Une pisse',
-    duration: '1h30',
-    genre: 'Figé',
-    poster: 'https://static.wikia.nocookie.net/onepiece/images/a/aa/Volume_77.png'
-  },
-  {
-    id: 2,
-    title: 'Dragon Boule à Z',
-    duration: '1h30',
-    genre: 'Figé',
-    poster: 'https://ih1.redbubble.net/image.1062591670.5646/mwo,x1000,ipad_2_snap-pad,750x1000,f8f8f8.jpg'
-  },
-  {
-    id: 3,
-    title: 'Gunter x Gunter',
-    duration: '1h30',
-    genre: 'Figé',
-    poster: 'https://fr.web.img5.acsta.net/pictures/19/08/01/09/52/4803203.jpg'
-  }
-];
+const prisma = new PrismaClient()
 
-const typeDefs = `#graphql
-  type Movie {
-    id: ID
-    title: String
-    duration: String
-    genre: String
-    picture: String
-  }
+app.get("/movies", async (req: Request, res: Response) => {
+  // GET ALL MOVIES
+  const posts = await prisma.movie.findMany()
+  return res.json(posts);
+});
 
-  type Query {
-    movies: [Movie]
-    movie(id: ID!): Movie
-  }
-
-  type Mutation {
-    addMovie(title: String, duration: String, genre: String, picture: String): Movie
-    updateMovie(id: ID!, title: String, duration: String, genre: String, picture: String): Movie
-    deleteMovie(id: ID!): Movie
-  }
-`;
-
-const resolvers = {
-  Query: {
-    movies: async () => {
-      return ALL_MEDIAS;
+app.post("/movies", async (req: Request, res: Response) => {
+  // ADD MOVIE
+  const { title, duration, genre, poster } = req.body
+  const movie = await prisma.movie.create({
+    data: {
+      title: title,
+      duration: duration,
+      genre: genre,
+      poster: poster,
     },
-    movie: async (parent: any, args: any) => {
-      const { id } = args;
-      const media = ALL_MEDIAS.find((media) => media.id == id)
-      return media
-    },
-  },
-};
+  })
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Welcome to Express & TypeScript Server");
+  return res.json(movie);
+});
+
+app.get("/movies/:id", async (req: Request, res: Response) => {
+  // GET ONE MOVIE
+  const { id } = req.params
+  const movie = await prisma.movie.findMany({
+    where: { id: Number(id) },
+  })
+
+  return res.json(movie);
+});
+
+app.put("/movies/:id", async (req: Request, res: Response) => {
+  // CHANGE ONE MOVIE
+  const { id } = req.params
+  const { title, duration, genre, poster } = req.body
+  const movie = await prisma.movie.update({
+    where: { id: Number(id) },
+    data: { 
+      title: title,
+      duration: duration,
+      genre: genre,
+      poster: poster,
+    },
+  })
+
+  return res.send(`Movie with id ${id} updated`);
+});
+
+app.delete("/movies/:id", async (req: Request, res: Response) => {
+  // DELETE ONE MOVIE
+  const { id } = req.params
+  await prisma.movie.delete({
+    where: {
+      id: Number(id),
+    },
+  })
+
+  return res.send(`Movie with id ${id} deleted`);
 });
 
 app.listen(port, () => {
-  console.log(`Server is Fire at http://localhost:${port}`);
+  console.log(`🚀 Server is Fire at http://localhost:${port}`);
 });
