@@ -9,4 +9,5 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.movie = Movie(sequelize, Sequelize);
+
 export default db;

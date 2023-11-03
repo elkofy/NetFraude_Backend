@@ -18,12 +18,12 @@ export const getMovieById = async(req: any, res: any) => {
 }
 
 export const createMovie = async(req: any, res: any) => {
-    console.log(req.body);
 
     const {title, duration, genre, poster} = req.body;
     
-    movie.create({title, duration, genre, poster});
-  
+    await movie.create({title, duration, genre, poster});
+    console.log('created',title, duration, genre, poster);
+
     return res.status(200).send("movie creates");
 }
 

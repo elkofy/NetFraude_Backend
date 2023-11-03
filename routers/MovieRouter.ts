@@ -1,10 +1,6 @@
-import { Sequelize, DataTypes } from 'sequelize';
 import express from 'express';
 import { getAll, getMovieById, createMovie, deleteMovie, updateMovie } from '../controllers/MovieController'
 
-const sequelize = new Sequelize({dialect: 'sqlite', storage: "./db-sqlite"});
-
-sequelize.sync({ force: true });
 
 const moviesRouter = express.Router();
 
