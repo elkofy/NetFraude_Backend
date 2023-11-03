@@ -1,14 +1,15 @@
-import sequelize from '../models/index';
-import db from '../models/index'
+import db from '../models/index';
+
+const movie = db.movie;
 
 export const getAll = async(req: any, res: any) => {
-    const allMovie = await db.movie.findAll();
+    const allMovie = await movie.findAll();
     return res.send(allMovie);
 }
 
 export const getMovieById = async(req: any, res: any) => {
     // GET ONE MOVIE
-    const currentMovie = await db.movie.findByPk(req.params.id);
+    const currentMovie = await movie.findByPk(req.params.id);
   
     if (!currentMovie) {
       return res.status(404).send("Not Found");
@@ -18,13 +19,16 @@ export const getMovieById = async(req: any, res: any) => {
 
 export const createMovie = async(req: any, res: any) => {
     console.log(req.body);
-    db.Movies.create(req.body);
+
+    const {title, duration, genre, poster} = req.body;
+    
+    movie.create({title, duration, genre, poster});
   
     return res.status(200).send("movie creates");
 }
 
 export const deleteMovie = async(req: any, res: any) => {
-    db.Movies.destroy({
+    movie.destroy({
         where: {
           id: req.params.id
         }
@@ -36,7 +40,7 @@ export const deleteMovie = async(req: any, res: any) => {
 export const updateMovie = async(req: any, res: any) => {
     const {title, duration, genre, poster} = req.body;
 
-    await db.movie.update({title: title, duration: duration, genre: genre, poster: poster}, {
+    await movie.update({title: title, duration: duration, genre: genre, poster: poster}, {
         where: {
           id: req.params.id,
         },

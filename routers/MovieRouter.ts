@@ -12,7 +12,7 @@ moviesRouter.get("/movies", getAll);
 
 moviesRouter.get("/movies/:id", getMovieById);
   
-moviesRouter.post("/movies", [], createMovie);
+moviesRouter.post("/movies", createMovie);
 
 moviesRouter.delete("/movies/:id", deleteMovie);
 
