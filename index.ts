@@ -1,14 +1,20 @@
 import express, { Application } from "express";
 import dotenv from "dotenv";
 import db from './models/index';
-import movieRouter from './routers/MovieRouter'
+import movieRouter from './routers/MovieRouter';
+import cors from 'cors';
 
 //For env File
 dotenv.config();
 
+let corsOptions = {
+  origin: "*"
+};
+
 const app: Application = express();
 const port = process.env.PORT || 8000;
 
+app.use(cors(corsOptions));
 // parse requests of content-type - application/json
 app.use(express.json());
 // parse requests of content-type - application/x-www-form-urlencoded
